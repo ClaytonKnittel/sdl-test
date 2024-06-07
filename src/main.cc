@@ -4,6 +4,7 @@
 #include "SDL2/SDL_pixels.h"
 #include "SDL2/SDL_surface.h"
 #include "SDL2/SDL_video.h"
+#include "absl/log/globals.h"
 #include "absl/log/initialize.h"
 #include "absl/log/log.h"
 
@@ -25,8 +26,19 @@ int Run() {
   while (loop) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        loop = false;
+      switch (event.type) {
+        case SDL_QUIT: {
+          loop = false;
+          break;
+        }
+        case SDL_KEYDOWN: {
+          LOG(INFO) << "Pressed " << (char) event.key.keysym.sym;
+          break;
+        }
+        case SDL_KEYUP: {
+          LOG(INFO) << "Released " << (char) event.key.keysym.sym;
+          break;
+        }
       }
     }
   }
@@ -36,6 +48,7 @@ int Run() {
 
 int main(int argc, char* argv[]) {
   absl::InitializeLog();
+  absl::SetStderrThreshold(absl::LogSeverity::kInfo);
 
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     LOG(ERROR) << "Failed to initialize SDL window: " << SDL_GetError();

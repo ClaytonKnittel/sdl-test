@@ -3,6 +3,7 @@ cc_binary(
   srcs = ["main.cc"],
   deps = [
     "@abseil-cpp//absl/log",
+    "@abseil-cpp//absl/log:globals",
     "@abseil-cpp//absl/log:initialize",
   ],
 )
