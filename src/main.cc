@@ -90,6 +90,9 @@ absl::Status Run() {
         }
         case SDL_KEYDOWN: {
           LOG(INFO) << "Pressed " << (char) event.key.keysym.sym;
+          if (event.key.keysym.sym == 'q') {
+            loop = false;
+          }
           break;
         }
         case SDL_KEYUP: {
