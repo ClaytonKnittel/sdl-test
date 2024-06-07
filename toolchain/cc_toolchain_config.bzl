@@ -113,6 +113,7 @@ def _impl(ctx):
           flag_group(
             flags = [
               "-lm",
+              "-lSDL2",
             ],
           ),
         ],
