@@ -19,6 +19,7 @@ int Run() {
 
   SDL_Surface* surface = SDL_GetWindowSurface(window);
   SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 100, 240, 246));
+  SDL_UpdateWindowSurface(window);
 
   bool loop = true;
   while (loop) {
