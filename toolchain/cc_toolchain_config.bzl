@@ -114,6 +114,7 @@ def _impl(ctx):
             flags = [
               "-lm",
               "-lSDL2",
+              "-lSDL2_image",
             ],
           ),
         ],
