@@ -6,10 +6,46 @@ cc_binary(
   ],
   deps = [
     ":utils",
+    ":window",
+    ":renderer",
+    ":texture",
     "@abseil-cpp//absl/log",
     "@abseil-cpp//absl/log:globals",
     "@abseil-cpp//absl/log:initialize",
     "@abseil-cpp//absl/status:status",
+    "@abseil-cpp//absl/status:statusor",
+    "@abseil-cpp//absl/strings",
+  ],
+)
+
+cc_library(
+  name = "window",
+  hdrs = ["window.h"],
+  srcs = ["window.cc"],
+  deps = [
+    "@abseil-cpp//absl/status:statusor",
+    "@abseil-cpp//absl/strings",
+  ],
+)
+
+cc_library(
+  name = "renderer",
+  hdrs = ["renderer.h"],
+  srcs = ["renderer.cc"],
+  deps = [
+    ":window",
+    "@abseil-cpp//absl/status:status",
+    "@abseil-cpp//absl/status:statusor",
+    "@abseil-cpp//absl/strings",
+  ],
+)
+
+cc_library(
+  name = "texture",
+  hdrs = ["texture.h"],
+  srcs = ["texture.cc"],
+  deps = [
+    ":renderer",
     "@abseil-cpp//absl/status:statusor",
     "@abseil-cpp//absl/strings",
   ],

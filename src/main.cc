@@ -13,71 +13,31 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 
+#include "src/renderer.h"
+#include "src/texture.h"
 #include "src/utils.h"
-
-absl::StatusOr<SDL_Window*> CreateWindow() {
-  SDL_Window* window =
-      SDL_CreateWindow("test window", SDL_WINDOWPOS_UNDEFINED,
-                       SDL_WINDOWPOS_UNDEFINED, 1000, 800, SDL_WINDOW_SHOWN);
-
-  if (window == nullptr) {
-    return absl::InternalError(
-        absl::StrCat("Failed to create SDL window: ", SDL_GetError()));
-  }
-
-  return window;
-}
-
-absl::StatusOr<SDL_Renderer*> CreateRenderer(SDL_Window* window) {
-  SDL_Renderer* renderer =
-      SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-  if (renderer == nullptr) {
-    return absl::InternalError(
-        absl::StrCat("Failed to create SDL renderer: ", SDL_GetError()));
-  }
-
-  SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
-
-  int img_flags = IMG_INIT_PNG;
-  if (!(IMG_Init(img_flags) & img_flags)) {
-    return absl::InternalError(
-        absl::StrCat("Failed to initialize PNG loading: ", SDL_GetError()));
-  }
-
-  return renderer;
-}
-
-absl::StatusOr<SDL_Texture*> LoadTexture(SDL_Renderer* renderer,
-                                         const std::string& path) {
-  // Load image at specified path
-  SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-  if (loadedSurface == NULL) {
-    return absl::InternalError(
-        absl::StrCat("Unable to load image ", path, ": ", IMG_GetError()));
-  }
-
-  // Create texture from surface pixels
-  SDL_Texture* newTexture =
-      SDL_CreateTextureFromSurface(renderer, loadedSurface);
-  if (newTexture == NULL) {
-    return absl::InternalError(absl::StrCat("Unable to create texture from ",
-                                            path, ": ", SDL_GetError()));
-  }
-
-  SDL_FreeSurface(loadedSurface);
-  return newTexture;
-}
+#include "src/window.h"
 
 absl::Status Run() {
-  DEFINE_OR_RETURN(SDL_Window*, window, CreateWindow());
-  DEFINE_OR_RETURN(SDL_Renderer*, renderer, CreateRenderer(window));
-  DEFINE_OR_RETURN(
-      SDL_Texture*, texture,
-      LoadTexture(renderer, "res/Madeline_Idle_Animation_(No_Backpack).png"));
+  DEFINE_OR_RETURN(sdl::Window, window,
+                   sdl::Window::CreateWindow(
+                       "test window", SDL_WINDOWPOS_UNDEFINED,
+                       SDL_WINDOWPOS_UNDEFINED, 1000, 800, SDL_WINDOW_SHOWN));
+  LOG(INFO) << "Got window";
 
-  SDL_Surface* surface = SDL_GetWindowSurface(window);
+  DEFINE_OR_RETURN(
+      sdl::Renderer, renderer,
+      sdl::Renderer::CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
+  RETURN_IF_ERROR(renderer.InititalizeImage(IMG_INIT_PNG));
+
+  DEFINE_OR_RETURN(
+      sdl::Texture, texture,
+      sdl::Texture::LoadFromImage(
+          renderer, "res/Madeline_Idle_Animation_(No_Backpack).png"));
+
+  SDL_Surface* surface = SDL_GetWindowSurface(window.SdlWindow());
   SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 100, 240, 246));
-  SDL_UpdateWindowSurface(window);
+  SDL_UpdateWindowSurface(window.SdlWindow());
 
   bool loop = true;
   while (loop) {
@@ -102,15 +62,11 @@ absl::Status Run() {
       }
     }
 
-    SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
+    SDL_RenderClear(renderer.SdlRenderer());
+    SDL_RenderCopy(renderer.SdlRenderer(), texture.SdlTexture(), NULL, NULL);
+    SDL_RenderPresent(renderer.SdlRenderer());
   }
 
-  // TODO: wrap these guys in objects so these can be called by destructor.
-  SDL_DestroyTexture(texture);
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
   return absl::OkStatus();
 }
 
