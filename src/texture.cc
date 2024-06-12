@@ -2,7 +2,6 @@
 
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_render.h"
-#include "absl/base/nullability.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 
