@@ -12,6 +12,7 @@
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
+#include "absl/time/clock.h"
 
 #include "src/renderer.h"
 #include "src/texture.h"
@@ -23,7 +24,6 @@ absl::Status Run() {
                    sdl::Window::CreateWindow(
                        "test window", SDL_WINDOWPOS_UNDEFINED,
                        SDL_WINDOWPOS_UNDEFINED, 1000, 800, SDL_WINDOW_SHOWN));
-  LOG(INFO) << "Got window";
 
   DEFINE_OR_RETURN(
       sdl::Renderer, renderer,
@@ -35,9 +35,13 @@ absl::Status Run() {
       sdl::Texture::LoadFromImage(
           renderer, "res/Madeline_Idle_Animation_(No_Backpack).png"));
 
-  SDL_Surface* surface = SDL_GetWindowSurface(window.SdlWindow());
-  SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 100, 240, 246));
-  SDL_UpdateWindowSurface(window.SdlWindow());
+  window.SetBackgroundColor(SDL_Color{
+      .r = 100,
+      .g = 240,
+      .b = 246,
+  });
+
+  // absl::Time now = absl::Now();
 
   bool loop = true;
   while (loop) {
@@ -49,28 +53,29 @@ absl::Status Run() {
           break;
         }
         case SDL_KEYDOWN: {
-          LOG(INFO) << "Pressed " << (char) event.key.keysym.sym;
+          LOG(INFO) << "Pressed " << static_cast<char>(event.key.keysym.sym);
           if (event.key.keysym.sym == 'q') {
             loop = false;
           }
           break;
         }
         case SDL_KEYUP: {
-          LOG(INFO) << "Released " << (char) event.key.keysym.sym;
+          LOG(INFO) << "Released " << static_cast<char>(event.key.keysym.sym);
           break;
         }
       }
     }
 
     SDL_RenderClear(renderer.SdlRenderer());
-    SDL_RenderCopy(renderer.SdlRenderer(), texture.SdlTexture(), NULL, NULL);
+    SDL_RenderCopy(renderer.SdlRenderer(), texture.SdlTexture(), nullptr,
+                   nullptr);
     SDL_RenderPresent(renderer.SdlRenderer());
   }
 
   return absl::OkStatus();
 }
 
-int main(int argc, char* argv[]) {
+int main(int /*argc*/, char* /*argv*/[]) {
   absl::InitializeLog();
   absl::SetStderrThreshold(absl::LogSeverity::kInfo);
 

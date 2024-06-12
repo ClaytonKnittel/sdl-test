@@ -15,6 +15,7 @@ cc_binary(
     "@abseil-cpp//absl/status:status",
     "@abseil-cpp//absl/status:statusor",
     "@abseil-cpp//absl/strings",
+    "@abseil-cpp//absl/time",
   ],
 )
 
@@ -23,6 +24,7 @@ cc_library(
   hdrs = ["window.h"],
   srcs = ["window.cc"],
   deps = [
+    ":sdl_utils",
     "@abseil-cpp//absl/status:statusor",
     "@abseil-cpp//absl/strings",
   ],
@@ -59,5 +61,13 @@ cc_library(
     "@abseil-cpp//absl/status:statusor",
     "@abseil-cpp//absl/strings",
     "@googletest//:gtest",
+  ],
+)
+
+cc_library(
+  name = "sdl_utils",
+  hdrs = ["sdl_utils.h"],
+  srcs = ["sdl_utils.cc"],
+  deps = [
   ],
 )
