@@ -59,6 +59,8 @@ absl::Status Run() {
           LOG(INFO) << "Released " << static_cast<char>(event.key.keysym.sym);
           break;
         }
+        default:
+          break;
       }
     }
 
