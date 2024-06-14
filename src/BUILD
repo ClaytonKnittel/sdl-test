@@ -14,8 +14,6 @@ cc_binary(
     "@abseil-cpp//absl/log:initialize",
     "@abseil-cpp//absl/status:status",
     "@abseil-cpp//absl/status:statusor",
-    "@abseil-cpp//absl/strings",
-    "@abseil-cpp//absl/time",
   ],
 )
 
