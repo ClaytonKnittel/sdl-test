@@ -19,8 +19,6 @@ class Renderer {
   static absl::StatusOr<Renderer> CreateRenderer(Window& window, int index,
                                                  Uint32 flags);
 
-  static absl::Status InititalizeImage(int flags);
-
   SDL_Renderer* SdlRenderer();
 
  private:

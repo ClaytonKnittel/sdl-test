@@ -1,6 +1,5 @@
 #include "src/renderer.h"
 
-#include "SDL2/SDL_image.h"
 #include "SDL2/SDL_render.h"
 #include "SDL2/SDL_stdinc.h"
 #include "absl/strings/str_cat.h"
@@ -32,16 +31,6 @@ absl::StatusOr<Renderer> Renderer::CreateRenderer(Window& window, int index,
   SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
   return Renderer(renderer);
-}
-
-// static
-absl::Status Renderer::InititalizeImage(int flags) {
-  if (!(IMG_Init(flags) & flags)) {
-    return absl::InternalError(
-        absl::StrCat("Failed to initialize PNG loading: ", SDL_GetError()));
-  }
-
-  return absl::OkStatus();
 }
 
 SDL_Renderer* Renderer::SdlRenderer() {

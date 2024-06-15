@@ -9,7 +9,10 @@
 #include "absl/log/initialize.h"
 #include "absl/log/log.h"
 #include "absl/status/status.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 
+#include "src/framerate_throttle.h"
 #include "src/renderer.h"
 #include "src/texture.h"
 #include "src/utils.h"
@@ -20,11 +23,12 @@ absl::Status Run() {
                    sdl::Window::CreateWindow(
                        "test window", SDL_WINDOWPOS_UNDEFINED,
                        SDL_WINDOWPOS_UNDEFINED, 1000, 800, SDL_WINDOW_SHOWN));
+  RETURN_IF_ERROR(window.InititalizeImage(IMG_INIT_PNG));
+  RETURN_IF_ERROR(window.InititalizeAudio());
 
   DEFINE_OR_RETURN(
       sdl::Renderer, renderer,
       sdl::Renderer::CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
-  RETURN_IF_ERROR(sdl::Renderer::InititalizeImage(IMG_INIT_PNG));
 
   DEFINE_OR_RETURN(
       sdl::Texture, texture,
@@ -37,10 +41,12 @@ absl::Status Run() {
       .b = 246,
   });
 
-  // absl::Time now = absl::Now();
+  game::FramerateThrottle throttle(/*target_fps=*/60, absl::Now());
 
   bool loop = true;
   while (loop) {
+    throttle.BeginFrame(absl::Now());
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       switch (event.type) {
@@ -68,6 +74,9 @@ absl::Status Run() {
     SDL_RenderCopy(renderer.SdlRenderer(), texture.SdlTexture(), nullptr,
                    nullptr);
     SDL_RenderPresent(renderer.SdlRenderer());
+
+    absl::Time now = absl::Now();
+    throttle.EndFrame(now);
   }
 
   return absl::OkStatus();
@@ -77,7 +86,7 @@ int main(int /*argc*/, char* /*argv*/[]) {
   absl::InitializeLog();
   absl::SetStderrThreshold(absl::LogSeverity::kInfo);
 
-  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
     LOG(ERROR) << "Failed to initialize SDL window: " << SDL_GetError();
     return -1;
   }
