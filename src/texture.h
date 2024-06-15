@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "SDL2/SDL_stdinc.h"
 #include "absl/status/statusor.h"
 
 #include "src/renderer.h"
@@ -13,7 +12,7 @@ namespace sdl {
 
 class Texture {
  public:
-  Texture(Texture&&);
+  Texture(Texture&&) noexcept;
   ~Texture();
 
   Texture& operator=(Texture&&) = delete;

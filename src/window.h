@@ -12,7 +12,7 @@ namespace sdl {
 
 class Window {
  public:
-  Window(Window&&);
+  Window(Window&&) noexcept;
   ~Window();
 
   Window& operator=(Window&&) = delete;

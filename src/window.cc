@@ -4,7 +4,6 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_video.h>
 
-#include "SDL2/SDL.h"
 #include "SDL2/SDL_stdinc.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
@@ -13,7 +12,7 @@
 
 namespace sdl {
 
-Window::Window(Window&& window) : window_(window.window_) {
+Window::Window(Window&& window) noexcept : window_(window.window_) {
   window.window_ = nullptr;
 }
 
@@ -38,7 +37,7 @@ absl::StatusOr<Window> Window::CreateWindow(const std::string& title, int x,
 
 void Window::SetBackgroundColor(SDL_Color color) {
   SDL_Surface* surface = SDL_GetWindowSurface(window_);
-  SDL_FillRect(surface, NULL, ColorToRGB(surface->format, color));
+  SDL_FillRect(surface, nullptr, ColorToRGB(surface->format, color));
   SDL_UpdateWindowSurface(window_);
 }
 

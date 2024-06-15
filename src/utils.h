@@ -3,7 +3,6 @@
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
-#include "absl/types/optional.h"
 #include "gmock/gmock-matchers.h"
 #include "gtest/gtest.h"
 
@@ -28,7 +27,7 @@ absl::Status DoAssignOrReturn(T &lhs, absl::StatusOr<T> result) {
 
 #define ASSIGN_OR_RETURN_IMPL(status, lhs, rexpr)       \
   absl::Status status = DoAssignOrReturn(lhs, (rexpr)); \
-  if (!status.ok())                                     \
+  if (!(status).ok())                                   \
     return status;
 
 // Executes an expression that returns a util::StatusOr, extracting its value
@@ -46,10 +45,10 @@ absl::Status DoAssignOrReturn(T &lhs, absl::StatusOr<T> result) {
 
 #define DEFINE_OR_RETURN_IMPL(type, lhs, tmp, rexpr) \
   absl::StatusOr<type> tmp = (rexpr);                \
-  if (!tmp.ok()) {                                   \
-    return tmp.status();                             \
+  if (!(tmp).ok()) {                                 \
+    return (tmp).status();                           \
   }                                                  \
-  type &lhs = tmp.value();
+  type &lhs = (tmp).value();  // NOLINT(bugprone-macro-parentheses)
 
 // Executes an expression that returns an absl::StatusOr<T>, and defines a new
 // variable with given type and name to the result if the error code is OK. If
@@ -77,15 +76,15 @@ absl::Status DoAssignOrReturn(T &lhs, absl::StatusOr<T> result) {
     if (!_statusor_to_verify.ok()) {                                           \
       FAIL() << #rexpr << " returned error: " << _statusor_to_verify.status(); \
     }                                                                          \
-    lhs = *std::move(_statusor_to_verify);                                     \
+    (lhs) = *std::move(_statusor_to_verify);                                   \
   } while (false)
 
-#define ASSERT_OK_AND_DEFINE_IMPL(type, lhs, tmp, rexpr)     \
-  absl::StatusOr<type> tmp = (rexpr);                        \
-  if (!tmp.ok()) {                                           \
-    FAIL() << #rexpr << " returned error: " << tmp.status(); \
-  }                                                          \
-  type &lhs = tmp.value();
+#define ASSERT_OK_AND_DEFINE_IMPL(type, lhs, tmp, rexpr)       \
+  absl::StatusOr<type> tmp = (rexpr);                          \
+  if (!(tmp).ok()) {                                           \
+    FAIL() << #rexpr << " returned error: " << (tmp).status(); \
+  }                                                            \
+  type &lhs = (tmp).value()  // NOLINT(bugprone-macro-parentheses)
 
 // Executes an expression that returns an absl::StatusOr<T>, and defines a new
 // variable with given type and name to the result if the error code is OK. If
@@ -108,6 +107,9 @@ class IsOkAndHoldsMatcher
   using ValueType = typename StatusOrT::value_type;
 
  public:
+  IsOkAndHoldsMatcher(const IsOkAndHoldsMatcher &) = delete;
+  IsOkAndHoldsMatcher(IsOkAndHoldsMatcher &&) = delete;
+
   template <typename MatcherT>
   explicit IsOkAndHoldsMatcher(MatcherT &&value_matcher)
       : value_matcher_(
@@ -165,7 +167,7 @@ class IsOkAndHoldsGenerator {
       : value_matcher_(std::move(value_matcher)) {}
 
   template <typename T>
-  operator ::testing::Matcher<const absl::StatusOr<T> &>() const {
+  explicit operator ::testing::Matcher<const absl::StatusOr<T> &>() const {
     return ::testing::MakeMatcher(
         new IsOkAndHoldsMatcher<absl::StatusOr<T>>(value_matcher_));
   }
@@ -181,11 +183,13 @@ class IsOkMatcher {
   IsOkMatcher() = default;
 
   // Describes the OK expectation.
+  // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
   void DescribeTo(std::ostream *os) const {
     *os << "is OK";
   }
 
   // Describes the negative OK expectation.
+  // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
   void DescribeNegationTo(std::ostream *os) const {
     *os << "is not OK";
   }

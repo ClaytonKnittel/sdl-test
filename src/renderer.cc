@@ -3,12 +3,14 @@
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_render.h"
 #include "SDL2/SDL_stdinc.h"
+#include "absl/strings/str_cat.h"
 
 #include "src/window.h"
 
 namespace sdl {
 
-Renderer::Renderer(Renderer&& renderer) : renderer_(renderer.renderer_) {
+Renderer::Renderer(Renderer&& renderer) noexcept
+    : renderer_(renderer.renderer_) {
   renderer.renderer_ = nullptr;
 }
 
@@ -32,6 +34,7 @@ absl::StatusOr<Renderer> Renderer::CreateRenderer(Window& window, int index,
   return Renderer(renderer);
 }
 
+// static
 absl::Status Renderer::InititalizeImage(int flags) {
   if (!(IMG_Init(flags) & flags)) {
     return absl::InternalError(

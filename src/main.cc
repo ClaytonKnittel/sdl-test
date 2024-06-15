@@ -24,7 +24,7 @@ absl::Status Run() {
   DEFINE_OR_RETURN(
       sdl::Renderer, renderer,
       sdl::Renderer::CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
-  RETURN_IF_ERROR(renderer.InititalizeImage(IMG_INIT_PNG));
+  RETURN_IF_ERROR(sdl::Renderer::InititalizeImage(IMG_INIT_PNG));
 
   DEFINE_OR_RETURN(
       sdl::Texture, texture,

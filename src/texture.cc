@@ -9,7 +9,7 @@
 
 namespace sdl {
 
-Texture::Texture(Texture&& texture) : texture_(texture.texture_) {
+Texture::Texture(Texture&& texture) noexcept : texture_(texture.texture_) {
   texture.texture_ = nullptr;
 }
 
@@ -23,22 +23,22 @@ Texture::~Texture() {
 absl::StatusOr<Texture> Texture::LoadFromImage(Renderer& renderer,
                                                const std::string& path) {
   // Load image at specified path
-  SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-  if (loadedSurface == NULL) {
+  SDL_Surface* loaded_surface = IMG_Load(path.c_str());
+  if (loaded_surface == nullptr) {
     return absl::InternalError(
         absl::StrCat("Unable to load image ", path, ": ", IMG_GetError()));
   }
 
   // Create texture from surface pixels
-  SDL_Texture* newTexture =
-      SDL_CreateTextureFromSurface(renderer.SdlRenderer(), loadedSurface);
-  if (newTexture == NULL) {
+  SDL_Texture* new_texture =
+      SDL_CreateTextureFromSurface(renderer.SdlRenderer(), loaded_surface);
+  if (new_texture == nullptr) {
     return absl::InternalError(absl::StrCat("Unable to create texture from ",
                                             path, ": ", SDL_GetError()));
   }
 
-  SDL_FreeSurface(loadedSurface);
-  return Texture(newTexture);
+  SDL_FreeSurface(loaded_surface);
+  return Texture(new_texture);
 }
 
 SDL_Texture* Texture::SdlTexture() {
