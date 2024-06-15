@@ -1,4 +1,5 @@
 #include <math.h>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
@@ -27,7 +28,7 @@
 #include "src/window.h"
 
 struct AudioState {
-  std::optional<sdl::SinWave> sin_wave;
+  std::vector<sdl::SinWave> sin_waves;
 };
 
 void DoAudio(void* udata, Uint8* stream, int stream_len,
@@ -38,10 +39,15 @@ void DoAudio(void* udata, Uint8* stream, int stream_len,
 
   sdl::AudioBuffer audio_buffer(stream, stream_len, channels);
 
-  if (!state->sin_wave.has_value()) {
-    state->sin_wave = sdl::SinWave(440.F, absl::Seconds(2), audio_spec);
+  if (state->sin_waves.empty()) {
+    for (int i = 0; i < 4; i++) {
+      state->sin_waves.emplace_back(220.F * (i + 2), absl::Seconds(2),
+                                    audio_spec);
+    }
   }
-  state->sin_wave.value().PopulateBufferWithNext(audio_buffer);
+  for (auto& wave : state->sin_waves) {
+    wave.PopulateBufferWithNext(audio_buffer);
+  }
 
   auto res = audio_buffer.TranslateBuffer(audio_spec.format);
   if (!res.ok()) {

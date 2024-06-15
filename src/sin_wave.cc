@@ -15,7 +15,7 @@ SinWave::SinWave(float hz, absl::Duration duration,
     : Note(duration, audio_spec), hz_(hz) {}
 
 float SinWave::GenerateNextNote() {
-  constexpr float kAmp = 0.1;
+  constexpr float kAmp = 0.04;
   float sample =
       kAmp * sinf32((hz_ * produced_samples_) / frequency_ * (2 * kPi));
   return sample;
