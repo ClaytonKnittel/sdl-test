@@ -92,7 +92,7 @@ absl::Status Run() {
   game::FramerateThrottle throttle(/*target_fps=*/60, absl::Now());
 
   bool loop = true;
-  while (loop) {
+  while (true) {
     throttle.BeginFrame(absl::Now());
 
     SDL_Event event;
@@ -116,6 +116,9 @@ absl::Status Run() {
         default:
           break;
       }
+    }
+    if (!loop) {
+      break;
     }
 
     SDL_RenderClear(renderer.SdlRenderer());
