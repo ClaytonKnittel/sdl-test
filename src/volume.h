@@ -10,8 +10,10 @@ namespace sdl {
 class Volume : public Note {
  public:
   Volume(float pct, std::unique_ptr<TimedNote> note);
+  ~Volume() override = default;
 
-  std::optional<float> GenerateNextNote() override;
+ protected:
+  std::optional<float> GenerateNextNoteImpl() override;
 
  private:
   float pct_;

@@ -10,6 +10,18 @@
 
 namespace sdl {
 
+std::optional<float> Note::GenerateNextNote() {
+  if (done_) {
+    return std::nullopt;
+  }
+
+  auto next = GenerateNextNoteImpl();
+  if (!next.has_value()) {
+    done_ = true;
+  }
+  return next;
+}
+
 bool Note::PopulateBuffer(AudioBuffer& buffer) {
   std::optional<float> next_note;
   for (auto it = buffer.begin();
@@ -26,7 +38,7 @@ TimedNote::TimedNote(absl::Duration duration, const SDL_AudioSpec& audio_spec)
       produced_samples_(0),
       frequency_(audio_spec.freq) {}
 
-std::optional<float> TimedNote::GenerateNextNote() {
+std::optional<float> TimedNote::GenerateNextNoteImpl() {
   if (produced_samples_ == sample_lifetime_) {
     return std::nullopt;
   }
