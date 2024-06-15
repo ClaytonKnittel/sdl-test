@@ -8,10 +8,12 @@ cc_binary(
     ":audio_buffer",
     ":audio_device",
     ":framerate_throttle",
+    ":note",
     ":renderer",
     ":sin_wave",
     ":texture",
     ":utils",
+    ":volume",
     ":window",
     "@abseil-cpp//absl/log",
     "@abseil-cpp//absl/log:globals",
@@ -112,6 +114,15 @@ cc_library(
   deps = [
     ":note",
     "@abseil-cpp//absl/time",
+  ],
+)
+
+cc_library(
+  name = "volume",
+  hdrs = ["volume.h"],
+  srcs = ["volume.cc"],
+  deps = [
+    ":note",
   ],
 )
 

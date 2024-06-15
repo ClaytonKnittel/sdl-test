@@ -1,4 +1,3 @@
-#include <math.h>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -21,14 +20,16 @@
 #include "src/audio_buffer.h"
 #include "src/audio_device.h"
 #include "src/framerate_throttle.h"
+#include "src/note.h"
 #include "src/renderer.h"
 #include "src/sin_wave.h"
 #include "src/texture.h"
 #include "src/utils.h"
+#include "src/volume.h"
 #include "src/window.h"
 
 struct AudioState {
-  std::vector<sdl::SinWave> sin_waves;
+  std::vector<std::unique_ptr<sdl::Note>> waves;
 };
 
 void DoAudio(void* udata, Uint8* stream, int stream_len,
@@ -39,14 +40,15 @@ void DoAudio(void* udata, Uint8* stream, int stream_len,
 
   sdl::AudioBuffer audio_buffer(stream, stream_len, channels);
 
-  if (state->sin_waves.empty()) {
+  if (state->waves.empty()) {
     for (int i = 0; i < 4; i++) {
-      state->sin_waves.emplace_back(0.04 - 0.005 * i, 55.F * (i + 2),
-                                    absl::Seconds(2), audio_spec);
+      state->waves.push_back(std::make_unique<sdl::Volume>(
+          0.04 - 0.005 * i, std::make_unique<sdl::SinWave>(
+                                55.F * (i + 2), absl::Seconds(2), audio_spec)));
     }
   }
-  for (auto& wave : state->sin_waves) {
-    wave.PopulateBufferWithNext(audio_buffer);
+  for (auto& wave : state->waves) {
+    wave->PopulateBuffer(audio_buffer);
   }
 
   auto res = audio_buffer.TranslateBuffer(audio_spec.format);

@@ -10,16 +10,25 @@ namespace sdl {
 
 class Note {
  public:
-  Note(absl::Duration duration, const SDL_AudioSpec& audio_spec);
+  // Generates the next sample for the note.
+  virtual std::optional<float> GenerateNextNote() = 0;
 
   // Fills up the buffer with sound data. If `true` is returned, that means the
   // note was fully consumed and will not produce any more sound data.
-  bool PopulateBufferWithNext(AudioBuffer& buffer);
+  bool PopulateBuffer(AudioBuffer& buffer);
+};
+
+class TimedNote : public Note {
+ public:
+  TimedNote(absl::Duration duration, const SDL_AudioSpec& audio_spec);
+
+  std::optional<float> GenerateNextNote() final;
+
+  // Infallible version of `GenerateNextNote()`. Notes that override this class
+  // should be able to generate sound forever.
+  virtual float NextNote() = 0;
 
  protected:
-  // Generates the next sample for the note.
-  virtual float GenerateNextNote() = 0;
-
   // How many samples the note will last for.
   uint64_t sample_lifetime_;
 

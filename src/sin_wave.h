@@ -8,13 +8,11 @@
 
 namespace sdl {
 
-class SinWave : public Note {
+class SinWave : public TimedNote {
  public:
-  SinWave(float amp, float hz, absl::Duration duration,
-          const SDL_AudioSpec& audio_spec);
+  SinWave(float hz, absl::Duration duration, const SDL_AudioSpec& audio_spec);
 
- protected:
-  float GenerateNextNote() override;
+  float NextNote() override;
 
  private:
   float amp_;
