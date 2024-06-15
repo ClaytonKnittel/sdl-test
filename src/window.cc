@@ -1,11 +1,11 @@
 #include "src/window.h"
 
-#include "SDL2/SDL_image.h"
-#include "SDL2/SDL_mixer.h"
-#include "SDL2/SDL_pixels.h"
-#include "SDL2/SDL_stdinc.h"
-#include "SDL2/SDL_surface.h"
-#include "SDL2/SDL_video.h"
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_video.h>
+
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 
@@ -14,12 +14,9 @@
 namespace sdl {
 
 Window::Window(Window&& window) noexcept
-    : window_(window.window_),
-      img_initialized_(window.img_initialized_),
-      audio_initialized_(window.audio_initialized_) {
+    : window_(window.window_), img_initialized_(window.img_initialized_) {
   window.window_ = nullptr;
   window.img_initialized_ = false;
-  window.audio_initialized_ = false;
 }
 
 Window::~Window() {
@@ -28,9 +25,6 @@ Window::~Window() {
   }
   if (img_initialized_) {
     IMG_Quit();
-  }
-  if (audio_initialized_) {
-    Mix_Quit();
   }
 }
 
@@ -54,17 +48,6 @@ absl::Status Window::InititalizeImage(int flags) {
   }
 
   img_initialized_ = true;
-  return absl::OkStatus();
-}
-
-absl::Status Window::InititalizeAudio() {
-  if (Mix_OpenAudio(/*frequency=*/44100, MIX_DEFAULT_FORMAT, /*channels=*/2,
-                    /*chunksize=*/2048) < 0) {
-    return absl::InternalError(
-        absl::StrCat("Failed to initialize audio: ", Mix_GetError()));
-  }
-
-  audio_initialized_ = true;
   return absl::OkStatus();
 }
 

@@ -1,10 +1,13 @@
 #include "src/audio_device.h"
 
-#include <SDL2/SDL_stdinc.h>
 #include <memory>
 
-#include "SDL2/SDL_audio.h"
+#include <SDL2/SDL_audio.h>
+#include <SDL2/SDL_error.h>
+#include <SDL2/SDL_stdinc.h>
+
 #include "absl/status/statusor.h"
+#include "absl/strings/str_cat.h"
 
 namespace sdl {
 
@@ -37,7 +40,17 @@ AudioDevice::~AudioDevice() {
 
 AudioDevice::AudioDevice(SDL_AudioDeviceID device_id,
                          std::unique_ptr<AudioDeviceCallbackData> data)
-    : device_id_(std::move(device_id)), data_(std::move(data)) {}
+    : device_id_(std::move(device_id)), data_(std::move(data)) {
+  Unpause();
+}
+
+void AudioDevice::Pause() {
+  SDL_PauseAudioDevice(device_id_.value(), 1);
+}
+
+void AudioDevice::Unpause() {
+  SDL_PauseAudioDevice(device_id_.value(), 0);
+}
 
 AudioDeviceBuilder& AudioDeviceBuilder::WithDevice(const char* device_name) {
   device_name_ = device_name;
@@ -49,32 +62,28 @@ AudioDeviceBuilder& AudioDeviceBuilder::WithFrequency(int frequency) {
   return *this;
 }
 
-AudioDeviceBuilder& AudioDeviceBuilder::WithFormat(
-    std::optional<SDL_AudioFormat> format) {
+AudioDeviceBuilder& AudioDeviceBuilder::WithFormat(SDL_AudioFormat format) {
   format_ = format;
   return *this;
 }
 
-AudioDeviceBuilder& AudioDeviceBuilder::WithChannels(
-    std::optional<Uint8> channels) {
+AudioDeviceBuilder& AudioDeviceBuilder::WithChannels(Uint8 channels) {
   channels_ = channels;
   return *this;
 }
 
-AudioDeviceBuilder& AudioDeviceBuilder::WithSamples(
-    std::optional<Uint16> samples) {
+AudioDeviceBuilder& AudioDeviceBuilder::WithSamples(Uint16 samples) {
   samples_ = samples;
   return *this;
 }
 
 AudioDeviceBuilder& AudioDeviceBuilder::WithCallback(
-    std::optional<AudioDevice::CallbackFn> callback) {
+    AudioDevice::CallbackFn callback) {
   callback_ = std::move(callback);
   return *this;
 }
 
-AudioDeviceBuilder& AudioDeviceBuilder::WithUserdata(
-    std::optional<void*> userdata) {
+AudioDeviceBuilder& AudioDeviceBuilder::WithUserdata(void* userdata) {
   userdata_ = userdata;
   return *this;
 }
@@ -102,13 +111,21 @@ absl::StatusOr<AudioDevice> AudioDeviceBuilder::Build() {
     .format = format_.value(),
     .channels = channels_.value(),
     .samples = samples_.value(),
-    .callback = &AudioDeviceCallback,
+    .callback = AudioDeviceCallback,
     .userdata = data.get(),
   };
 
   SDL_AudioDeviceID device_id =
       SDL_OpenAudioDevice(device_name_.value_or(nullptr), 0, &desired,
                           &data->audio_spec, SDL_AUDIO_ALLOW_ANY_CHANGE);
+  if (device_id == 0) {
+    return absl::InternalError(
+        absl::StrCat("Failed to open audio device: ", SDL_GetError()));
+  }
+
+  std::cout << data->audio_spec.format << " "
+            << static_cast<int>(data->audio_spec.channels) << " "
+            << data->audio_spec.samples << std::endl;
 
   return AudioDevice(device_id, std::move(data));
 }

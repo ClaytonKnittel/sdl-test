@@ -83,14 +83,17 @@ IfMacros:
   - KJ_IF_MAYBE
 IncludeBlocks:   Regroup
 IncludeCategories:
+  - Regex:           '^<SDL2/.*>'
+    Priority:        2
+    CaseSensitive:   true
   - Regex:           '^<.*>'
     Priority:        1
     CaseSensitive:   true
-  - Regex:           '^"(absl|gmock|google|gtest|SDL2)/.*\.h"'
-    Priority:        2
+  - Regex:           '^"(absl|gmock|google|gtest)/.*\.h"'
+    Priority:        3
     CaseSensitive:   true
   - Regex:           '".*\.h"'
-    Priority:        3
+    Priority:        4
     CaseSensitive:   true
 IncludeIsMainRegex: '([-_](test|unittest))?$'
 IncludeIsMainSourceRegex: ''

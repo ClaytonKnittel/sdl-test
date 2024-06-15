@@ -2,8 +2,9 @@
 
 #include <string>
 
-#include "SDL2/SDL_pixels.h"
-#include "SDL2/SDL_stdinc.h"
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_stdinc.h>
+
 #include "absl/status/statusor.h"
 
 struct SDL_Window;
@@ -22,8 +23,6 @@ class Window {
 
   absl::Status InititalizeImage(int flags);
 
-  absl::Status InititalizeAudio();
-
   void SetBackgroundColor(SDL_Color color);
 
   SDL_Window* SdlWindow();
@@ -33,7 +32,6 @@ class Window {
 
   SDL_Window* window_;
   bool img_initialized_ = false;
-  bool audio_initialized_ = false;
 };
 
 }  // namespace sdl

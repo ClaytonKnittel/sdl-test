@@ -5,9 +5,11 @@ cc_binary(
     "//res:imgs",
   ],
   deps = [
+    ":audio_buffer",
     ":audio_device",
     ":framerate_throttle",
     ":renderer",
+    ":sin_wave",
     ":texture",
     ":utils",
     ":window",
@@ -79,6 +81,37 @@ cc_library(
   srcs = ["audio_device.cc"],
   deps = [
     "@abseil-cpp//absl/status:statusor",
+    "@abseil-cpp//absl/strings",
+  ],
+)
+
+cc_library(
+  name = "audio_buffer",
+  hdrs = ["audio_buffer.h"],
+  srcs = ["audio_buffer.cc"],
+  deps = [
+    "@abseil-cpp//absl/status:status",
+    "@abseil-cpp//absl/strings:str_format",
+  ],
+)
+
+cc_library(
+  name = "note",
+  hdrs = ["note.h"],
+  srcs = ["note.cc"],
+  deps = [
+    ":audio_buffer",
+    "@abseil-cpp//absl/time",
+  ],
+)
+
+cc_library(
+  name = "sin_wave",
+  hdrs = ["sin_wave.h"],
+  srcs = ["sin_wave.cc"],
+  deps = [
+    ":note",
+    "@abseil-cpp//absl/time",
   ],
 )
 

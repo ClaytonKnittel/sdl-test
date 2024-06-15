@@ -3,8 +3,9 @@
 #include <memory>
 #include <optional>
 
-#include "SDL2/SDL_audio.h"
-#include "SDL2/SDL_stdinc.h"
+#include <SDL2/SDL_audio.h>
+#include <SDL2/SDL_stdinc.h>
+
 #include "absl/status/statusor.h"
 
 namespace sdl {
@@ -24,6 +25,12 @@ class AudioDevice {
 
   AudioDevice& operator=(AudioDevice&&) = delete;
 
+  // Pauses the audio device.
+  void Pause();
+
+  // Unpauses the audio device.
+  void Unpause();
+
  private:
   AudioDevice(SDL_AudioDeviceID device_id,
               std::unique_ptr<AudioDeviceCallbackData> data_);
@@ -38,12 +45,11 @@ class AudioDeviceBuilder {
 
   AudioDeviceBuilder& WithDevice(const char* device_name);
   AudioDeviceBuilder& WithFrequency(int frequency);
-  AudioDeviceBuilder& WithFormat(std::optional<SDL_AudioFormat> format);
-  AudioDeviceBuilder& WithChannels(std::optional<Uint8> channels);
-  AudioDeviceBuilder& WithSamples(std::optional<Uint16> samples);
-  AudioDeviceBuilder& WithCallback(
-      std::optional<AudioDevice::CallbackFn> callback);
-  AudioDeviceBuilder& WithUserdata(std::optional<void*> userdata);
+  AudioDeviceBuilder& WithFormat(SDL_AudioFormat format);
+  AudioDeviceBuilder& WithChannels(Uint8 channels);
+  AudioDeviceBuilder& WithSamples(Uint16 samples);
+  AudioDeviceBuilder& WithCallback(AudioDevice::CallbackFn callback);
+  AudioDeviceBuilder& WithUserdata(void* userdata);
 
   absl::StatusOr<AudioDevice> Build();
 

@@ -1,10 +1,15 @@
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_error.h"
-#include "SDL2/SDL_events.h"
-#include "SDL2/SDL_image.h"
-#include "SDL2/SDL_pixels.h"
-#include "SDL2/SDL_render.h"
-#include "SDL2/SDL_video.h"
+#include <math.h>
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_audio.h>
+#include <SDL2/SDL_error.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_pixels.h>
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_stdinc.h>
+#include <SDL2/SDL_video.h>
+
 #include "absl/log/globals.h"
 #include "absl/log/initialize.h"
 #include "absl/log/log.h"
@@ -12,11 +17,38 @@
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 
+#include "src/audio_buffer.h"
+#include "src/audio_device.h"
 #include "src/framerate_throttle.h"
 #include "src/renderer.h"
+#include "src/sin_wave.h"
 #include "src/texture.h"
 #include "src/utils.h"
 #include "src/window.h"
+
+struct AudioState {
+  std::optional<sdl::SinWave> sin_wave;
+};
+
+void DoAudio(void* udata, Uint8* stream, int stream_len,
+             const SDL_AudioSpec& audio_spec) {
+  auto* state = static_cast<AudioState*>(udata);
+
+  Uint8 channels = audio_spec.channels;
+
+  sdl::AudioBuffer audio_buffer(stream, stream_len, channels);
+
+  if (!state->sin_wave.has_value()) {
+    state->sin_wave = sdl::SinWave(440.F, absl::Seconds(2), audio_spec);
+  }
+  state->sin_wave.value().PopulateBufferWithNext(audio_buffer);
+
+  auto res = audio_buffer.TranslateBuffer(audio_spec.format);
+  if (!res.ok()) {
+    LOG(ERROR) << res;
+    SDL_memset(stream, 0, stream_len);
+  }
+}
 
 absl::Status Run() {
   DEFINE_OR_RETURN(sdl::Window, window,
@@ -24,7 +56,6 @@ absl::Status Run() {
                        "test window", SDL_WINDOWPOS_UNDEFINED,
                        SDL_WINDOWPOS_UNDEFINED, 1000, 800, SDL_WINDOW_SHOWN));
   RETURN_IF_ERROR(window.InititalizeImage(IMG_INIT_PNG));
-  RETURN_IF_ERROR(window.InititalizeAudio());
 
   DEFINE_OR_RETURN(
       sdl::Renderer, renderer,
@@ -34,6 +65,17 @@ absl::Status Run() {
       sdl::Texture, texture,
       sdl::Texture::LoadFromImage(
           renderer, "res/Madeline_Idle_Animation_(No_Backpack).png"));
+
+  AudioState audio_state;
+  sdl::AudioDeviceBuilder audio_builder;
+  DEFINE_OR_RETURN(sdl::AudioDevice, audio_device,
+                   audio_builder.WithFrequency(44100)
+                       .WithChannels(2)
+                       .WithSamples(4096)
+                       .WithFormat(AUDIO_F32LSB)
+                       .WithCallback(DoAudio)
+                       .WithUserdata(&audio_state)
+                       .Build());
 
   window.SetBackgroundColor(SDL_Color{
       .r = 100,

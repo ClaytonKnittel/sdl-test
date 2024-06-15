@@ -1,6 +1,7 @@
 #pragma once
 
-#include "SDL2/SDL_stdinc.h"
+#include <SDL2/SDL_stdinc.h>
+
 #include "absl/status/statusor.h"
 
 #include "src/window.h"
