@@ -3,6 +3,8 @@
 #include <memory>
 #include <optional>
 
+#include <SDL2/SDL_audio.h>
+
 #include "src/note.h"
 
 namespace sdl {
@@ -13,7 +15,8 @@ class Volume : public Note {
   ~Volume() override = default;
 
  protected:
-  std::optional<float> GenerateNextNoteImpl() override;
+  std::optional<float> GenerateNextNoteImpl(
+      const SDL_AudioSpec& audio_spec) override;
 
  private:
   float pct_;

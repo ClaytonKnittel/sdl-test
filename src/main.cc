@@ -59,25 +59,15 @@ class AudioState {
     lock_.unlock();
   }
 
-  void SetAudioSpec(const SDL_AudioSpec& audio_spec) {
-    audio_spec_ = audio_spec;
-  }
-
-  const std::optional<SDL_AudioSpec>& AudioSpec() const {
-    return audio_spec_;
-  }
-
  private:
   std::vector<std::unique_ptr<sdl::Note>> waves_;
   std::vector<std::unique_ptr<sdl::Note>> new_notes_;
-  std::optional<SDL_AudioSpec> audio_spec_;
   std::mutex lock_;
 };
 
 void DoAudio(void* udata, Uint8* stream, int stream_len,
              const SDL_AudioSpec& audio_spec) {
   auto* state = static_cast<AudioState*>(udata);
-  state->SetAudioSpec(audio_spec);
 
   Uint8 channels = audio_spec.channels;
 
@@ -85,7 +75,7 @@ void DoAudio(void* udata, Uint8* stream, int stream_len,
 
   state->UpdateState();
   for (const auto& wave : state->Waves()) {
-    wave->PopulateBuffer(audio_buffer);
+    wave->PopulateBuffer(audio_buffer, audio_spec);
   }
 
   auto res = audio_buffer.TranslateBuffer(audio_spec.format);
@@ -180,12 +170,8 @@ absl::Status Run() {
             default:
               break;
           }
-          if (audio_state.AudioSpec().has_value()) {
-            audio_state.AddNewNote(std::make_unique<sdl::Volume>(
-                0.035,
-                std::make_unique<sdl::SinWave>(
-                    freq, absl::Seconds(2), audio_state.AudioSpec().value())));
-          }
+          audio_state.AddNewNote(std::make_unique<sdl::Volume>(
+              0.035, std::make_unique<sdl::SinWave>(freq, absl::Seconds(2))));
           break;
         }
         case SDL_KEYUP: {
