@@ -41,8 +41,8 @@ void DoAudio(void* udata, Uint8* stream, int stream_len,
 
   if (state->sin_waves.empty()) {
     for (int i = 0; i < 4; i++) {
-      state->sin_waves.emplace_back(220.F * (i + 2), absl::Seconds(2),
-                                    audio_spec);
+      state->sin_waves.emplace_back(0.04 - 0.005 * i, 55.F * (i + 2),
+                                    absl::Seconds(2), audio_spec);
     }
   }
   for (auto& wave : state->sin_waves) {

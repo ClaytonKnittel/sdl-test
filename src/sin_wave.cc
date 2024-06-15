@@ -10,14 +10,13 @@ namespace sdl {
 
 constexpr float kPi = 3.14159265359F;
 
-SinWave::SinWave(float hz, absl::Duration duration,
+SinWave::SinWave(float amp, float hz, absl::Duration duration,
                  const SDL_AudioSpec& audio_spec)
-    : Note(duration, audio_spec), hz_(hz) {}
+    : Note(duration, audio_spec), amp_(amp), hz_(hz) {}
 
 float SinWave::GenerateNextNote() {
-  constexpr float kAmp = 0.04;
   float sample =
-      kAmp * sinf32((hz_ * produced_samples_) / frequency_ * (2 * kPi));
+      amp_ * sinf32((hz_ * produced_samples_) / frequency_ * (2 * kPi));
   return sample;
 }
 
