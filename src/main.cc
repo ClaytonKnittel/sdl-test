@@ -2,7 +2,6 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
-#include <optional>
 #include <vector>
 
 #include <SDL2/SDL.h>
@@ -175,7 +174,6 @@ absl::Status Run() {
           break;
         }
         case SDL_KEYUP: {
-          LOG(INFO) << "Released " << static_cast<char>(event.key.keysym.sym);
           break;
         }
         default:
