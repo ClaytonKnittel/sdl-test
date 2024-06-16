@@ -12,6 +12,7 @@ cc_binary(
     ":renderer",
     ":sin_wave",
     ":texture",
+    ":triangle_wave",
     ":utils",
     ":volume",
     ":window",
@@ -111,6 +112,16 @@ cc_library(
   name = "sin_wave",
   hdrs = ["sin_wave.h"],
   srcs = ["sin_wave.cc"],
+  deps = [
+    ":note",
+    "@abseil-cpp//absl/time",
+  ],
+)
+
+cc_library(
+  name = "triangle_wave",
+  hdrs = ["triangle_wave.h"],
+  srcs = ["triangle_wave.cc"],
   deps = [
     ":note",
     "@abseil-cpp//absl/time",

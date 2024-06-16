@@ -9,6 +9,7 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
@@ -28,6 +29,7 @@
 #include "src/renderer.h"
 #include "src/sin_wave.h"
 #include "src/texture.h"
+#include "src/triangle_wave.h"
 #include "src/utils.h"
 #include "src/volume.h"
 #include "src/window.h"
@@ -121,6 +123,7 @@ absl::Status Run() {
   game::FramerateThrottle throttle(/*target_fps=*/60, absl::Now());
 
   bool loop = true;
+  bool shift_held = false;
   while (true) {
     throttle.BeginFrame(absl::Now());
 
@@ -134,6 +137,9 @@ absl::Status Run() {
         case SDL_KEYDOWN: {
           if (event.key.keysym.sym == 'q') {
             loop = false;
+          }
+          if (event.key.keysym.sym == SDLK_LSHIFT) {
+            shift_held = true;
           }
 
           float freq;
@@ -167,13 +173,26 @@ absl::Status Run() {
               break;
             }
             default:
+              freq = -1;
               break;
           }
-          audio_state.AddNewNote(std::make_unique<sdl::Volume>(
-              0.035, std::make_unique<sdl::SinWave>(freq, absl::Seconds(2))));
+          if (freq > 0) {
+            std::unique_ptr<sdl::TimedNote> note;
+            if (shift_held) {
+              note = std::make_unique<sdl::TriangleWave>(freq / 2,
+                                                         absl::Seconds(2));
+            } else {
+              note = std::make_unique<sdl::SinWave>(freq, absl::Seconds(2));
+            }
+            audio_state.AddNewNote(
+                std::make_unique<sdl::Volume>(0.035, std::move(note)));
+          }
           break;
         }
         case SDL_KEYUP: {
+          if (event.key.keysym.sym == SDLK_LSHIFT) {
+            shift_held = false;
+          }
           break;
         }
         default:
