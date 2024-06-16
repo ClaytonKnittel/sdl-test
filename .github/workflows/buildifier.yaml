@@ -1,0 +1,20 @@
+name: Buildifier
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  check-buildifier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out SDL Test
+        uses: actions/checkout@v2
+        with:
+          path: sdl-test
+      - uses: bazelbuild/setup-bazelisk@v3
+      - name: Check Buildifier
+        working-directory: sdl-test
+        run: |
+          bazel run :buildifier.check

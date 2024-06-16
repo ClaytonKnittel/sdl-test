@@ -2,13 +2,22 @@ load("@buildifier_prebuilt//:rules.bzl", "buildifier")
 load("@hedron_compile_commands//:refresh_compile_commands.bzl", "refresh_compile_commands")
 
 buildifier(
+    name = "buildifier",
+    exclude_patterns = [
+        "./.git/*",
+    ],
+    lint_mode = "fix",
+    mode = "fix",
+)
+
+buildifier(
     name = "buildifier.check",
     diff_command = "diff",
     exclude_patterns = [
         "./.git/*",
     ],
     lint_mode = "warn",
-    mode = "fix",
+    mode = "check",
 )
 
 refresh_compile_commands(
