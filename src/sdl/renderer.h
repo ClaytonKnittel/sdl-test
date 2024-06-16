@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <SDL2/SDL_render.h>
@@ -53,6 +54,8 @@ class Renderer {
                        DrawPriority priority);
 
   absl::Status RemoveDrawable(EntityId id);
+
+  std::optional<Drawable*> FindDrawable(EntityId id);
 
  private:
   struct DrawableEntry {

@@ -141,34 +141,36 @@ absl::Status Run() {
 
   game::FramerateThrottle throttle(/*target_fps=*/60, absl::Now());
 
-  renderer.AddDrawable(std::make_unique<sdl::shape::Rect>(
-                           SDL_FRect{
-                               .x = 100,
-                               .y = 100,
-                               .w = 800,
-                               .h = 600,
-                           },
-                           SDL_Color{
-                               .r = 0xff,
-                               .g = 0x50,
-                               .b = 0xa0,
-                               .a = 0xff,
-                           }),
-                       sdl::DrawPriority::kForeground);
-  renderer.AddDrawable(std::make_unique<sdl::shape::Rect>(
-                           SDL_FRect{
-                               .x = 50,
-                               .y = 50,
-                               .w = 500,
-                               .h = 300,
-                           },
-                           SDL_Color{
-                               .r = 0x40,
-                               .g = 0x80,
-                               .b = 0x90,
-                               .a = 0xff,
-                           }),
-                       sdl::DrawPriority::kBackground);
+  sdl::Renderer::EntityId id1 =
+      renderer.AddDrawable(std::make_unique<sdl::shape::Rect>(
+                               SDL_FRect{
+                                   .x = 100,
+                                   .y = 100,
+                                   .w = 800,
+                                   .h = 600,
+                               },
+                               SDL_Color{
+                                   .r = 0xff,
+                                   .g = 0x50,
+                                   .b = 0xa0,
+                                   .a = 0xff,
+                               }),
+                           sdl::DrawPriority::kForeground);
+  sdl::Renderer::EntityId id2 =
+      renderer.AddDrawable(std::make_unique<sdl::shape::Rect>(
+                               SDL_FRect{
+                                   .x = 50,
+                                   .y = 50,
+                                   .w = 500,
+                                   .h = 300,
+                               },
+                               SDL_Color{
+                                   .r = 0x40,
+                                   .g = 0x80,
+                                   .b = 0x90,
+                                   .a = 0xff,
+                               }),
+                           sdl::DrawPriority::kBackground);
 
   bool loop = true;
   bool shift_held = false;
@@ -260,6 +262,24 @@ absl::Status Run() {
     if (!loop) {
       break;
     }
+
+    sdl::shape::Rect* r1 =
+        static_cast<sdl::shape::Rect*>(renderer.FindDrawable(id1).value());
+    sdl::shape::Rect* r2 =
+        static_cast<sdl::shape::Rect*>(renderer.FindDrawable(id2).value());
+
+    r1->SetRect({
+        .x = r1->InnerRect().x + 1,
+        .y = r1->InnerRect().y,
+        .w = r1->InnerRect().w,
+        .h = r1->InnerRect().h,
+    });
+    r2->SetColor({
+        .r = static_cast<Uint8>(r2->Color().r + 1),
+        .g = r2->Color().g,
+        .b = r2->Color().b,
+        .a = r2->Color().a,
+    });
 
     renderer.Render();
 

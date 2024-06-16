@@ -47,4 +47,20 @@ void Rect::Render(SDL_Vertex* vertices) {
   };
 }
 
+const SDL_FRect& Rect::InnerRect() const {
+  return rect_;
+}
+
+void Rect::SetRect(SDL_FRect rect) {
+  rect_ = rect;
+}
+
+SDL_Color Rect::Color() const {
+  return color_;
+}
+
+void Rect::SetColor(SDL_Color color) {
+  color_ = color;
+}
+
 }  // namespace sdl::shape

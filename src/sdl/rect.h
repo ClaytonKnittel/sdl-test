@@ -18,6 +18,14 @@ class Rect : public Drawable {
 
   void Render(SDL_Vertex* vertices) override;
 
+  const SDL_FRect& InnerRect() const;
+
+  void SetRect(SDL_FRect rect);
+
+  SDL_Color Color() const;
+
+  void SetColor(SDL_Color color);
+
  private:
   SDL_FRect rect_;
   SDL_Color color_;

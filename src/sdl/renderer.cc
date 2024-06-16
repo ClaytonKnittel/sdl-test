@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
@@ -95,6 +96,15 @@ absl::Status Renderer::RemoveDrawable(EntityId id) {
   // TODO: track unused memory, reallocate/shrink vector later.
   drawables_.erase(it);
   return absl::OkStatus();
+}
+
+std::optional<Drawable*> Renderer::FindDrawable(EntityId id) {
+  auto it = drawables_.find(id);
+  if (it == drawables_.end()) {
+    return std::nullopt;
+  }
+
+  return it->second.drawable.get();
 }
 
 Renderer::Renderer(SDL_Renderer* renderer)
