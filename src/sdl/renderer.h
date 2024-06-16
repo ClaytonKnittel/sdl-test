@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -18,6 +19,20 @@ struct SDL_Renderer;
 
 namespace sdl {
 
+// Determines which layer of the canvas a drawable is drawn. The higher priority
+// (i.e. the lower down the list), the farther forward the drawable is drawn
+// (i.e. is drawn on top of drawables with lower priority).
+enum class DrawPriority {
+  // Lowest priority. Rendered in the back.
+  kBackground,
+  // Renders in front of background objects.
+  kForeground,
+  // Reserved for the UI, which renders on top of everything else.
+  kUi,
+
+  kNumDrawPriorities,
+};
+
 class Renderer {
  public:
   using EntityId = uint64_t;
@@ -34,13 +49,15 @@ class Renderer {
 
   void Render();
 
-  EntityId AddDrawable(std::unique_ptr<Drawable> drawable);
+  EntityId AddDrawable(std::unique_ptr<Drawable> drawable,
+                       DrawPriority priority);
 
   absl::Status RemoveDrawable(EntityId id);
 
  private:
   struct DrawableEntry {
     std::unique_ptr<Drawable> drawable;
+    DrawPriority priority;
     uint64_t size;
     uint64_t first_vertex_idx;
   };
@@ -50,7 +67,8 @@ class Renderer {
   SDL_Renderer* renderer_;
 
   absl::flat_hash_map<EntityId, DrawableEntry> drawables_;
-  std::vector<SDL_Vertex> vertices_;
+  std::vector<SDL_Vertex>
+      vertices_[static_cast<size_t>(DrawPriority::kNumDrawPriorities)];
 
   EntityId next_id_;
 };

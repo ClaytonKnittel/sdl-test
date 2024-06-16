@@ -1,5 +1,6 @@
 #include "src/sdl/renderer.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 
@@ -47,27 +48,37 @@ SDL_Renderer* Renderer::SdlRenderer() {
 
 void Renderer::Render() {
   SDL_RenderClear(renderer_);
-  SDL_memset(vertices_.data(), 0, vertices_.size() * sizeof(SDL_Vertex));
+  for (auto& vertices : vertices_) {
+    SDL_memset(vertices.data(), 0, vertices.size() * sizeof(SDL_Vertex));
+  }
 
   for (const auto& [id, entry] : drawables_) {
-    entry.drawable->Render(vertices_.data() + entry.first_vertex_idx);
+    entry.drawable->Render(
+        vertices_[static_cast<size_t>(entry.priority)].data() +
+        entry.first_vertex_idx);
   }
-  SDL_RenderGeometry(renderer_, nullptr, vertices_.data(), vertices_.size(),
-                     nullptr, 0);
+
+  for (auto& vertices : vertices_) {
+    SDL_RenderGeometry(renderer_, nullptr, vertices.data(), vertices.size(),
+                       nullptr, 0);
+  }
   SDL_RenderPresent(renderer_);
 }
 
-EntityId Renderer::AddDrawable(std::unique_ptr<Drawable> drawable) {
+EntityId Renderer::AddDrawable(std::unique_ptr<Drawable> drawable,
+                               DrawPriority priority) {
   EntityId id = next_id_++;
 
   const uint64_t size = drawable->Size();
-  const uint64_t first_vertex_idx = vertices_.size();
-  vertices_.resize(first_vertex_idx + size);
+  const auto array_idx = static_cast<size_t>(priority);
+  const uint64_t first_vertex_idx = vertices_[array_idx].size();
+  vertices_[array_idx].resize(first_vertex_idx + size);
 
   drawables_.insert({
       id,
       DrawableEntry{
           .drawable = std::move(drawable),
+          .priority = priority,
           .size = size,
           .first_vertex_idx = first_vertex_idx,
       },

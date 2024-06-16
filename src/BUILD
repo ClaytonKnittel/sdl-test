@@ -10,7 +10,6 @@ cc_binary(
         ":utils",
         "//src/sdl:rect",
         "//src/sdl:renderer",
-        "//src/sdl:texture",
         "//src/sdl:window",
         "//src/sdl/sound:audio_buffer",
         "//src/sdl/sound:audio_device",

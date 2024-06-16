@@ -33,7 +33,6 @@
 #include "src/sdl/sound/sin_wave.h"
 #include "src/sdl/sound/triangle_wave.h"
 #include "src/sdl/sound/volume.h"
-#include "src/sdl/texture.h"
 #include "src/sdl/window.h"
 #include "src/utils.h"
 
@@ -143,31 +142,33 @@ absl::Status Run() {
   game::FramerateThrottle throttle(/*target_fps=*/60, absl::Now());
 
   renderer.AddDrawable(std::make_unique<sdl::shape::Rect>(
-      SDL_FRect{
-          .x = 100,
-          .y = 100,
-          .w = 800,
-          .h = 600,
-      },
-      SDL_Color{
-          .r = 0xff,
-          .g = 0x50,
-          .b = 0xa0,
-          .a = 0xff,
-      }));
+                           SDL_FRect{
+                               .x = 100,
+                               .y = 100,
+                               .w = 800,
+                               .h = 600,
+                           },
+                           SDL_Color{
+                               .r = 0xff,
+                               .g = 0x50,
+                               .b = 0xa0,
+                               .a = 0xff,
+                           }),
+                       sdl::DrawPriority::kForeground);
   renderer.AddDrawable(std::make_unique<sdl::shape::Rect>(
-      SDL_FRect{
-          .x = 50,
-          .y = 50,
-          .w = 500,
-          .h = 300,
-      },
-      SDL_Color{
-          .r = 0x40,
-          .g = 0x80,
-          .b = 0x90,
-          .a = 0xff,
-      }));
+                           SDL_FRect{
+                               .x = 50,
+                               .y = 50,
+                               .w = 500,
+                               .h = 300,
+                           },
+                           SDL_Color{
+                               .r = 0x40,
+                               .g = 0x80,
+                               .b = 0x90,
+                               .a = 0xff,
+                           }),
+                       sdl::DrawPriority::kBackground);
 
   bool loop = true;
   bool shift_held = false;
@@ -260,46 +261,6 @@ absl::Status Run() {
       break;
     }
 
-    // SDL_RenderClear(renderer.SdlRenderer());
-    // SDL_RenderCopy(renderer.SdlRenderer(), texture.SdlTexture(), nullptr,
-    //                nullptr);
-
-    // SDL_Vertex vertices[] = {
-    //   {
-    //       .position = { .x = 0, .y = 0 },
-    //       .color = { .r = 0xff, .g = 0xff, .b = 0xff, .a = 0xff },
-    //       .tex_coord = { .x = 0, .y = 0 },
-    //   },
-    //   {
-    //       .position = { .x = 1000, .y = 0 },
-    //       .color = { .r = 0xff, .g = 0xff, .b = 0xff, .a = 0xff },
-    //       .tex_coord = { .x = 1, .y = 0 },
-    //   },
-    //   {
-    //       .position = { .x = 1000, .y = 800 },
-    //       .color = { .r = 0xff, .g = 0xff, .b = 0xff, .a = 0xff },
-    //       .tex_coord = { .x = 1, .y = 1 },
-    //   },
-    //   {
-    //       .position = { .x = 0, .y = 0 },
-    //       .color = { .r = 0xff, .g = 0xff, .b = 0xff, .a = 0xff },
-    //       .tex_coord = { .x = 0, .y = 0 },
-    //   },
-    //   {
-    //       .position = { .x = 1000, .y = 800 },
-    //       .color = { .r = 0xff, .g = 0xff, .b = 0xff, .a = 0xff },
-    //       .tex_coord = { .x = 1, .y = 1 },
-    //   },
-    //   {
-    //       .position = { .x = 0, .y = 800 },
-    //       .color = { .r = 0xff, .g = 0xff, .b = 0xff, .a = 0xff },
-    //       .tex_coord = { .x = 0, .y = 1 },
-    //   },
-    // };
-    // SDL_RenderGeometry(renderer.SdlRenderer(), texture.SdlTexture(),
-    // vertices,
-    //                    6, nullptr, 0);
-    // SDL_RenderPresent(renderer.SdlRenderer());
     renderer.Render();
 
     absl::Time now = absl::Now();
