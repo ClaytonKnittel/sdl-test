@@ -1,7 +1,8 @@
 #include "src/framerate_throttle.h"
 
-#include <SDL2/SDL_timer.h>
 #include <cstdint>
+
+#include <SDL2/SDL_timer.h>
 
 #include "absl/log/log.h"
 #include "absl/time/time.h"

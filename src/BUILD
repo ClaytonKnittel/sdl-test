@@ -7,6 +7,7 @@ cc_binary(
   deps = [
     ":audio_buffer",
     ":audio_device",
+    ":busy_calculator",
     ":framerate_throttle",
     ":note",
     ":renderer",
@@ -141,6 +142,16 @@ cc_library(
   name = "framerate_throttle",
   hdrs = ["framerate_throttle.h"],
   srcs = ["framerate_throttle.cc"],
+  deps = [
+    "@abseil-cpp//absl/log",
+    "@abseil-cpp//absl/time",
+  ],
+)
+
+cc_library(
+  name = "busy_calculator",
+  hdrs = ["busy_calculator.h"],
+  srcs = ["busy_calculator.cc"],
   deps = [
     "@abseil-cpp//absl/log",
     "@abseil-cpp//absl/time",

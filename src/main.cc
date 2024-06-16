@@ -24,6 +24,7 @@
 
 #include "src/audio_buffer.h"
 #include "src/audio_device.h"
+#include "src/busy_calculator.h"
 #include "src/framerate_throttle.h"
 #include "src/note.h"
 #include "src/renderer.h"
@@ -36,6 +37,8 @@
 
 class AudioState {
  public:
+  AudioState() : busy_calc_(absl::Now()) {}
+
   const std::vector<std::unique_ptr<sdl::Note>>& Waves() {
     return waves_;
   }
@@ -60,15 +63,29 @@ class AudioState {
     lock_.unlock();
   }
 
+  void BeginFrame() {
+    lock_.lock();
+    busy_calc_.BeginFrame(absl::Now());
+    lock_.unlock();
+  }
+
+  void EndFrame() {
+    lock_.lock();
+    busy_calc_.EndFrame(absl::Now());
+    lock_.unlock();
+  }
+
  private:
   std::vector<std::unique_ptr<sdl::Note>> waves_;
   std::vector<std::unique_ptr<sdl::Note>> new_notes_;
+  game::BusyCalculator busy_calc_;
   std::mutex lock_;
 };
 
 void DoAudio(void* udata, Uint8* stream, int stream_len,
              const SDL_AudioSpec& audio_spec) {
   auto* state = static_cast<AudioState*>(udata);
+  state->BeginFrame();
 
   Uint8 channels = audio_spec.channels;
 
@@ -84,6 +101,7 @@ void DoAudio(void* udata, Uint8* stream, int stream_len,
     LOG(ERROR) << res;
     SDL_memset(stream, 0, stream_len);
   }
+  state->EndFrame();
 }
 
 absl::Status Run() {
@@ -124,6 +142,7 @@ absl::Status Run() {
 
   bool loop = true;
   bool shift_held = false;
+  bool ctrl_held = false;
   while (true) {
     throttle.BeginFrame(absl::Now());
 
@@ -140,6 +159,9 @@ absl::Status Run() {
           }
           if (event.key.keysym.sym == SDLK_LSHIFT) {
             shift_held = true;
+          }
+          if (event.key.keysym.sym == SDLK_CAPSLOCK) {
+            ctrl_held = true;
           }
 
           float freq;
@@ -178,6 +200,9 @@ absl::Status Run() {
           }
           if (freq > 0) {
             std::unique_ptr<sdl::TimedNote> note;
+            if (ctrl_held) {
+              freq *= 0.94387;
+            }
             if (shift_held) {
               note = std::make_unique<sdl::TriangleWave>(freq / 2,
                                                          absl::Seconds(2));
@@ -192,6 +217,9 @@ absl::Status Run() {
         case SDL_KEYUP: {
           if (event.key.keysym.sym == SDLK_LSHIFT) {
             shift_held = false;
+          }
+          if (event.key.keysym.sym == SDLK_CAPSLOCK) {
+            ctrl_held = false;
           }
           break;
         }
