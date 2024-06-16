@@ -1,4 +1,4 @@
-#include "src/note.h"
+#include "src/sdl/sound/note.h"
 
 #include <optional>
 
@@ -6,7 +6,7 @@
 
 #include "absl/time/time.h"
 
-#include "src/audio_buffer.h"
+#include "src/sdl/sound/audio_buffer.h"
 
 namespace sdl {
 

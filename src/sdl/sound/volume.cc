@@ -1,11 +1,11 @@
-#include "src/volume.h"
+#include "src/sdl/sound/volume.h"
 
 #include <memory>
 #include <optional>
 
 #include <SDL2/SDL_audio.h>
 
-#include "src/note.h"
+#include "src/sdl/sound/note.h"
 
 namespace sdl {
 

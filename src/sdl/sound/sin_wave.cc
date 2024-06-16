@@ -1,10 +1,10 @@
-#include "src/sin_wave.h"
+#include "src/sdl/sound/sin_wave.h"
 
 #include <SDL2/SDL_audio.h>
 
 #include "absl/time/time.h"
 
-#include "src/note.h"
+#include "src/sdl/sound/note.h"
 
 namespace sdl {
 

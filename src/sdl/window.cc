@@ -1,4 +1,4 @@
-#include "src/window.h"
+#include "src/sdl/window.h"
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_pixels.h>
@@ -9,7 +9,7 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 
-#include "src/sdl_utils.h"
+#include "src/sdl/sdl_utils.h"
 
 namespace sdl {
 

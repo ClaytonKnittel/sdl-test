@@ -5,7 +5,7 @@
 
 #include <SDL2/SDL_audio.h>
 
-#include "src/note.h"
+#include "src/sdl/sound/note.h"
 
 namespace sdl {
 

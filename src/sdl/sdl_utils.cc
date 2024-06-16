@@ -1,4 +1,4 @@
-#include "src/sdl_utils.h"
+#include "src/sdl/sdl_utils.h"
 
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_stdinc.h>

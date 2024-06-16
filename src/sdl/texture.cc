@@ -1,4 +1,4 @@
-#include "src/texture.h"
+#include "src/sdl/texture.h"
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
@@ -6,7 +6,7 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 
-#include "src/renderer.h"
+#include "src/sdl/renderer.h"
 
 namespace sdl {
 

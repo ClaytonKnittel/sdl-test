@@ -2,6 +2,7 @@ cc_library(
     name = "window",
     srcs = ["window.cc"],
     hdrs = ["window.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":sdl_utils",
         "@abseil-cpp//absl/status:statusor",
@@ -13,6 +14,7 @@ cc_library(
     name = "renderer",
     srcs = ["renderer.cc"],
     hdrs = ["renderer.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":window",
         "@abseil-cpp//absl/status:status",
@@ -25,6 +27,7 @@ cc_library(
     name = "texture",
     srcs = ["texture.cc"],
     hdrs = ["texture.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":renderer",
         "@abseil-cpp//absl/status:statusor",

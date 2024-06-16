@@ -4,7 +4,7 @@
 
 #include "absl/status/statusor.h"
 
-#include "src/renderer.h"
+#include "src/sdl/renderer.h"
 
 struct SDL_Texture;
 

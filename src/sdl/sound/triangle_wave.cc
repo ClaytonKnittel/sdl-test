@@ -1,4 +1,4 @@
-#include "src/triangle_wave.h"
+#include "src/sdl/sound/triangle_wave.h"
 
 #include <cmath>
 
@@ -6,7 +6,7 @@
 
 #include "absl/time/time.h"
 
-#include "src/note.h"
+#include "src/sdl/sound/note.h"
 
 namespace sdl {
 

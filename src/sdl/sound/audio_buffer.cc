@@ -1,4 +1,4 @@
-#include "src/audio_buffer.h"
+#include "src/sdl/sound/audio_buffer.h"
 
 #include <cstdint>
 

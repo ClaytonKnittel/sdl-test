@@ -4,7 +4,8 @@
 
 #include "absl/time/time.h"
 
-#include "src/note.h"
+#include "src/sdl/sound/note.h"
+
 namespace sdl {
 
 class TriangleWave : public TimedNote {

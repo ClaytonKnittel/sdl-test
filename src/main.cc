@@ -22,18 +22,18 @@
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 
-#include "src/audio_buffer.h"
-#include "src/audio_device.h"
 #include "src/busy_calculator.h"
 #include "src/framerate_throttle.h"
-#include "src/note.h"
-#include "src/renderer.h"
-#include "src/sin_wave.h"
-#include "src/texture.h"
-#include "src/triangle_wave.h"
+#include "src/sdl/renderer.h"
+#include "src/sdl/sound/audio_buffer.h"
+#include "src/sdl/sound/audio_device.h"
+#include "src/sdl/sound/note.h"
+#include "src/sdl/sound/sin_wave.h"
+#include "src/sdl/sound/triangle_wave.h"
+#include "src/sdl/sound/volume.h"
+#include "src/sdl/texture.h"
+#include "src/sdl/window.h"
 #include "src/utils.h"
-#include "src/volume.h"
-#include "src/window.h"
 
 class AudioState {
  public:

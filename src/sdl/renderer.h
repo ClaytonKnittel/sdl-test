@@ -4,7 +4,7 @@
 
 #include "absl/status/statusor.h"
 
-#include "src/window.h"
+#include "src/sdl/window.h"
 
 struct SDL_Renderer;
 

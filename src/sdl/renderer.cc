@@ -1,11 +1,11 @@
-#include "src/renderer.h"
+#include "src/sdl/renderer.h"
 
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 
 #include "absl/strings/str_cat.h"
 
-#include "src/window.h"
+#include "src/sdl/window.h"
 
 namespace sdl {
 
