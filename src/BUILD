@@ -8,6 +8,7 @@ cc_binary(
         ":busy_calculator",
         ":framerate_throttle",
         ":utils",
+        "//src/sdl:rect",
         "//src/sdl:renderer",
         "//src/sdl:texture",
         "//src/sdl:window",

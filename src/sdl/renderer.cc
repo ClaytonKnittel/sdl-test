@@ -1,13 +1,20 @@
 #include "src/sdl/renderer.h"
 
+#include <cstdint>
+#include <memory>
+
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_stdinc.h>
 
+#include "absl/status/status.h"
 #include "absl/strings/str_cat.h"
 
+#include "src/sdl/drawable.h"
 #include "src/sdl/window.h"
 
 namespace sdl {
+
+using EntityId = Renderer::EntityId;
 
 Renderer::Renderer(Renderer&& renderer) noexcept
     : renderer_(renderer.renderer_) {
@@ -38,6 +45,48 @@ SDL_Renderer* Renderer::SdlRenderer() {
   return renderer_;
 }
 
-Renderer::Renderer(SDL_Renderer* renderer) : renderer_(renderer) {}
+void Renderer::Render() {
+  SDL_RenderClear(renderer_);
+  SDL_memset(vertices_.data(), 0, vertices_.size() * sizeof(SDL_Vertex));
+
+  for (const auto& [id, entry] : drawables_) {
+    entry.drawable->Render(vertices_.data() + entry.first_vertex_idx);
+  }
+  SDL_RenderGeometry(renderer_, nullptr, vertices_.data(), vertices_.size(),
+                     nullptr, 0);
+  SDL_RenderPresent(renderer_);
+}
+
+EntityId Renderer::AddDrawable(std::unique_ptr<Drawable> drawable) {
+  EntityId id = next_id_++;
+
+  const uint64_t size = drawable->Size();
+  const uint64_t first_vertex_idx = vertices_.size();
+  vertices_.resize(first_vertex_idx + size);
+
+  drawables_.insert({
+      id,
+      DrawableEntry{
+          .drawable = std::move(drawable),
+          .size = size,
+          .first_vertex_idx = first_vertex_idx,
+      },
+  });
+  return id;
+}
+
+absl::Status Renderer::RemoveDrawable(EntityId id) {
+  auto it = drawables_.find(id);
+  if (it == drawables_.end()) {
+    return absl::InternalError(absl::StrCat("No such entity with id ", id));
+  }
+
+  // TODO: track unused memory, reallocate/shrink vector later.
+  drawables_.erase(it);
+  return absl::OkStatus();
+}
+
+Renderer::Renderer(SDL_Renderer* renderer)
+    : renderer_(renderer), next_id_(1000) {}
 
 }  // namespace sdl

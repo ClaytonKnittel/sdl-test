@@ -16,8 +16,10 @@ cc_library(
     hdrs = ["renderer.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":drawable",
         ":window",
-        "@abseil-cpp//absl/status:status",
+        "@abseil-cpp//absl/container:flat_hash_map",
+        "@abseil-cpp//absl/status",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
     ],
@@ -32,6 +34,24 @@ cc_library(
         ":renderer",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
+    ],
+)
+
+cc_library(
+    name = "drawable",
+    hdrs = ["drawable.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)
+
+cc_library(
+    name = "rect",
+    srcs = ["rect.cc"],
+    hdrs = ["rect.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":drawable",
     ],
 )
 
