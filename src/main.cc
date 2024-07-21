@@ -172,6 +172,31 @@ absl::Status Run() {
                                }),
                            sdl::DrawPriority::kBackground);
 
+  // for (auto freq : { 1., 6. / 5, 9. / 5, 11. / 5 }) {
+  //   std::unique_ptr<sdl::TimedNote> note =
+  //       std::make_unique<sdl::SinWave>(330. * freq, absl::Seconds(2));
+  //   audio_state.AddNewNote(
+  //       std::make_unique<sdl::Volume>(0.035, std::move(note)));
+  // }
+  // for (auto freq : { 1., 8. / 7, 10. / 7, 12. / 7 }) {
+  //   std::unique_ptr<sdl::TimedNote> note =
+  //       std::make_unique<sdl::SinWave>(330. * freq, absl::Seconds(2));
+  //   audio_state.AddNewNote(
+  //       std::make_unique<sdl::Volume>(0.035, std::move(note)));
+  // }
+  // for (auto freq : { 1., 7. / 6, 9. / 6, 11. / 6 }) {
+  //   std::unique_ptr<sdl::TimedNote> note =
+  //       std::make_unique<sdl::SinWave>(330. * freq, absl::Seconds(2));
+  //   audio_state.AddNewNote(
+  //       std::make_unique<sdl::Volume>(0.035, std::move(note)));
+  // }
+  // for (auto freq : { 1., 9. / 8, 12. / 8, 15. / 8 }) {
+  //   std::unique_ptr<sdl::TimedNote> note =
+  //       std::make_unique<sdl::SinWave>(330. * freq, absl::Seconds(2));
+  //   audio_state.AddNewNote(
+  //       std::make_unique<sdl::Volume>(0.035, std::move(note)));
+  // }
+
   bool loop = true;
   bool shift_held = false;
   bool ctrl_held = false;
