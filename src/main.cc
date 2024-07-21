@@ -196,6 +196,12 @@ absl::Status Run() {
   //   audio_state.AddNewNote(
   //       std::make_unique<sdl::Volume>(0.035, std::move(note)));
   // }
+  // for (auto freq : { 1., 11. / 9, 13. / 9, 17. / 9 }) {
+  //   std::unique_ptr<sdl::TimedNote> note =
+  //       std::make_unique<sdl::SinWave>(330. * freq, absl::Seconds(2));
+  //   audio_state.AddNewNote(
+  //       std::make_unique<sdl::Volume>(0.035, std::move(note)));
+  // }
 
   bool loop = true;
   bool shift_held = false;
